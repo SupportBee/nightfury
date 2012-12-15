@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'nightfury'
+require 'timecop'
 
 # Start our own redis-server to avoid corrupting any others
 REDIS_BIN  = 'redis-server'
@@ -22,7 +23,8 @@ at_exit do
   File.unlink REDIS_DUMP if File.exists? REDIS_DUMP
 end
 
-Redis.current = Redis.new(:host => REDIS_HOST, :port => REDIS_PORT)
+REDIS_CLIENT = Redis.new(:host => REDIS_HOST, :port => REDIS_PORT)
+Redis.current = REDIS_CLIENT
 
 RSpec.configure do |config|
   config.mock_with :flexmock
