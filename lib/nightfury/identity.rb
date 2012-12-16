@@ -2,6 +2,11 @@ module Nightfury
   module Identity
     class Base
 
+      METRIC_MAPPINGS = {
+            :value => Nightfury::Metric::Value,
+            :time_series => Nightfury::Metric::TimeSeries
+          }
+
       class << self
         
         attr_reader :metrics
@@ -13,21 +18,14 @@ module Nightfury
         def metric(name, type = :value)
           @metrics ||= {}
           @metrics[name] = {type: type}
-          define_method(name) do
-            unless instance_variable_get("@_#{name}")
-              _metric = self.class.metric_mappings[type].new(name, redis_key_prefix: key_prefix)
-              instance_variable_set("@_#{name}", _metric)
+           
+          class_eval <<-ENDOFMETHOD
+            def #{name}
+              @_#{name} ||= METRIC_MAPPINGS[:#{type}].new(:#{name}, redis_key_prefix: key_prefix)
             end
-            instance_variable_get("@_#{name}")
-          end
+          ENDOFMETHOD
         end
 
-        def metric_mappings
-          {
-            :value => Nightfury::Metric::Value,
-            :time_series => Nightfury::Metric::TimeSeries
-          }
-        end
       end
       
       attr_accessor :id
