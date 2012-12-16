@@ -1,5 +1,3 @@
-require 'json'
-
 module Nightfury
   module Metric
     class TimeSeries < Base
