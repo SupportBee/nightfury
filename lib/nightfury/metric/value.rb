@@ -10,12 +10,12 @@ module Nightfury
         redis.get(redis_key)
       end
 
-      def incr
-        redis.incr(redis_key)
+      def incr(step=1)
+        redis.incrby(redis_key, step)
       end
     
-      def decr
-        redis.decr(redis_key)
+      def decr(step=1)
+        redis.decrby(redis_key, step)
       end
 
       private

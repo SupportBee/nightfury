@@ -1,9 +1,9 @@
 require 'redis'
 require 'redis-namespace'
+require 'json'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/class/attribute'
 require 'active_support/core_ext/string/inflections'
-require 'active_support/json'
 require 'active_support/concern'
 
 module Nightfury

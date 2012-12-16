@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Nightfury::Metric::Value do
   it "should get a value by delegating to redis" do
     value_metric = Nightfury::Metric::Value.new(:tickets_count)
@@ -15,13 +13,13 @@ describe Nightfury::Metric::Value do
 
   it "should increment a value by delegating to redis" do
     value_metric = Nightfury::Metric::Value.new(:tickets_count)
-    flexmock(value_metric.redis).should_receive(:incr).with('metric:tickets_count').once
+    flexmock(value_metric.redis).should_receive(:incrby).with('metric:tickets_count', 1).once
     value_metric.incr
   end
 
   it "should decrement a value by delegating to redis" do
     value_metric = Nightfury::Metric::Value.new(:tickets_count)
-    flexmock(value_metric.redis).should_receive(:decr).with('metric:tickets_count').once
-    value_metric.decr
+    flexmock(value_metric.redis).should_receive(:decrby).with('metric:tickets_count', 2).once
+    value_metric.decr(2)
   end
 end
