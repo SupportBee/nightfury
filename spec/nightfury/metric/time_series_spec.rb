@@ -1,7 +1,56 @@
 require 'spec_helper'
 
 describe Nightfury::Metric::TimeSeries do
-  describe "#set" do
+  describe "Getter" do
+    describe "#get" do
+      context "without timestamp" do
+        it "should get the most recent data point" do
+          ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+          time_now = Time.now
+          time_later = time_now + 10
+          ts_metric.set(1, time_now)
+          ts_metric.set(2, time_later)
+          result = ts_metric.get
+          result[time_later.to_i.to_s].should == '2'
+        end
+      end
+
+      context "with timestamp" do
+        it "should get the data point at the time stamp" do
+          ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+          time_now = Time.now
+          time_later = time_now + 10
+          ts_metric.set(1, time_now)
+          ts_metric.set(2, time_later)
+          result = ts_metric.get(time_now)
+          result[time_now.to_i.to_s].should == '1'
+        end
+      end
+    end
+
+    describe "#get_range" do
+      it "should get all data points between the specified ranges" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        time = Time.now
+        loop_time = time.dup
+
+        10.times do |i|
+          ts_metric.set(i, loop_time)
+          loop_time = loop_time + 1
+        end
+
+        start_time = time + 3
+        end_time = time + 5
+
+        result = ts_metric.get_range(start_time, end_time)
+        result[start_time.to_i.to_s].should == '3'
+        result[(start_time.to_i + 1).to_s].should == '4'
+        result[end_time.to_i.to_s].should == '5'
+      end
+    end
+  end
+
+  describe "Setter" do
     context "key does not exist" do
       describe "initialize a time series" do
         it "should add meta data" do
