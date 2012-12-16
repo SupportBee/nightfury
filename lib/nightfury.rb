@@ -35,3 +35,6 @@ end
 
 require "nightfury/version"
 require "nightfury/metric"
+require "nightfury/metric/value"
+require "nightfury/metric/time_series"
+
