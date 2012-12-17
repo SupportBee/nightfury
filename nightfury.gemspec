@@ -2,10 +2,10 @@
 require File.expand_path('../lib/nightfury/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["Avinasha Shastry"]
-  gem.email         = ["me@avinasha.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.authors       = ["Avinasha Shastry", "Prateek Dayal"]
+  gem.email         = ["me@avinasha.com", "prateek@supportbee.com"]
+  gem.description   = %q{Nightfury is a reporting/analytics backend written on Redis}
+  gem.summary       = %q{Nightfury is a reporting/analytics backend written on Redis}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
