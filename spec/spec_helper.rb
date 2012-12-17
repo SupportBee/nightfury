@@ -28,4 +28,8 @@ Redis.current = REDIS_CLIENT
 
 RSpec.configure do |config|
   config.mock_with :flexmock
+
+  config.before(:each) do
+    REDIS_CLIENT.flushdb
+  end
 end

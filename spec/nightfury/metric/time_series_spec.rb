@@ -1,6 +1,13 @@
 require 'spec_helper'
 
 describe Nightfury::Metric::TimeSeries do
+  describe "Initialization" do
+    it "should initialize a time series (setup meta data)" do
+      ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
+      ts_metric.meta.should == {}
+    end
+  end
+
   describe "Getter" do
     describe "#get" do
       context "without timestamp" do
@@ -48,19 +55,25 @@ describe Nightfury::Metric::TimeSeries do
         result[end_time.to_i.to_s].should == '5'
       end
     end
+
+    describe "#get_all" do
+      it "should get all the data points in the series" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        time = Time.now
+        loop_time = time.dup
+
+        10.times do |i|
+          ts_metric.set(i, loop_time)
+          loop_time = loop_time + 1
+        end
+
+        result = ts_metric.get_all
+        result.length.should == 10
+      end
+    end
   end
 
   describe "Setter" do
-    context "key does not exist" do
-      describe "initialize a time series" do
-        it "should add meta data" do
-          ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
-          ts_metric.set(1)
-          ts_metric.meta.should == {}
-        end
-      end
-    end
-
     describe "add the value to timeline" do
       it "should default time to current time" do
         time_now = Time.now 

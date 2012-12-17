@@ -1,9 +1,14 @@
 module Nightfury
   module Metric
     class TimeSeries < Base
+
+      def initialize(name, options={})
+        super(name, options={})
+        init_time_series unless redis.exists(redis_key)
+      end
+
       def set(value, time=Time.now)
         value = before_set(value)
-        init_time_series unless redis.exists(redis_key)
         add_value_to_timeline(value, time)
       end
       
@@ -23,14 +28,13 @@ module Nightfury
       def get_range(start_time, end_time)
         start_time = start_time.to_i
         end_time = end_time.to_i
-
-        result = {}
         data_points = redis.zrangebyscore(redis_key, start_time, end_time)
-        data_points.each do |data_point|
-          time, data = decode_data_point(data_point)
-          result[time] = data
-        end
-        result
+        decode_many_data_points(data_points)
+      end
+
+      def get_all
+        data_points = redis.zrange(redis_key,1,-1)
+        decode_many_data_points(data_points)         
       end
 
       def meta
@@ -48,6 +52,15 @@ module Nightfury
         time = time.to_i
         value = "#{time}:#{value}"
         redis.zadd redis_key, time, value
+      end
+
+      def decode_many_data_points(data_points)
+        result = {}
+        data_points.each do |data_point|
+          time, data = decode_data_point(data_point)
+          result[time] = data
+        end
+        result
       end
 
       def decode_data_point(data_point)
