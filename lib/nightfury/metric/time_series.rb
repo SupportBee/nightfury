@@ -9,10 +9,15 @@ module Nightfury
 
       def set(value, time=Time.now)
         value = before_set(value)
+        # make sure the time_series is initialized.
+        # It will not if the metric is removed and 
+        # set is called on the smae object
+        init_time_series unless redis.exists(redis_key)
         add_value_to_timeline(value, time)
       end
       
       def get(timestamp=nil)
+        return nil unless redis.exists(redis_key)
         data_point = ''
         if timestamp
           timestamp = timestamp.to_i
@@ -26,6 +31,7 @@ module Nightfury
       end
 
       def get_range(start_time, end_time)
+        return nil unless redis.exists(redis_key)        
         start_time = start_time.to_i
         end_time = end_time.to_i
         data_points = redis.zrangebyscore(redis_key, start_time, end_time)
@@ -33,6 +39,7 @@ module Nightfury
       end
 
       def get_all
+        return nil unless redis.exists(redis_key)        
         data_points = redis.zrange(redis_key,1,-1)
         decode_many_data_points(data_points)         
       end

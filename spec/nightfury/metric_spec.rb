@@ -20,4 +20,10 @@ describe Nightfury::Metric::Base do
     metric = Nightfury::Metric::Base.new(:tickets_count)
     metric.redis.should == Nightfury.redis
   end
+
+  it "should be able to remove itself" do
+    metric = Nightfury::Metric::Base.new(:tickets_count)
+    flexmock(metric.redis).should_receive(:del).with('metric:tickets_count').once
+    metric.delete
+  end
 end

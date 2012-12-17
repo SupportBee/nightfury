@@ -13,6 +13,10 @@ module Nightfury
         prefix = redis_key_prefix.blank? ? '' : "#{redis_key_prefix}:"
         "#{prefix}metric:#{name}" 
       end
+
+      def delete
+        redis.del redis_key
+      end
     end
   end
 end

@@ -10,6 +10,13 @@ describe Nightfury::Metric::TimeSeries do
 
   describe "Getter" do
     describe "#get" do
+      it "should retrun nil if metric key on redis is empty" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        # delete redis key
+        ts_metric.redis.del ts_metric.redis_key
+        ts_metric.get.should be_nil
+      end
+
       context "without timestamp" do
         it "should get the most recent data point" do
           ts_metric = Nightfury::Metric::TimeSeries.new(:time)
@@ -36,6 +43,13 @@ describe Nightfury::Metric::TimeSeries do
     end
 
     describe "#get_range" do
+      it "should retrun nil if metric key on redis is empty" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        # delete redis key
+        ts_metric.redis.del ts_metric.redis_key
+        ts_metric.get_range(Time.now, Time.now).should be_nil
+      end
+
       it "should get all data points between the specified ranges" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         time = Time.now
@@ -57,6 +71,13 @@ describe Nightfury::Metric::TimeSeries do
     end
 
     describe "#get_all" do
+      it "should retrun nil if metric key on redis is empty" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        # delete redis key
+        ts_metric.redis.del ts_metric.redis_key
+        ts_metric.get_all.should be_nil
+      end
+
       it "should get all the data points in the series" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         time = Time.now
