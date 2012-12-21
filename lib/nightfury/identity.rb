@@ -10,7 +10,7 @@ module Nightfury
 
       class << self
         
-        attr_reader :metrics
+        attr_reader :metrics, :store_as
 
         def name
           self.to_s.demodulize.underscore
@@ -36,7 +36,8 @@ module Nightfury
       end
 
       def key_prefix
-        "#{self.class.name}:#{id}"
+        store_name = self.class.store_as ? self.class.store_as : self.class.name
+        "#{store_name}:#{id}"
       end
     end
   end

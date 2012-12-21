@@ -34,6 +34,12 @@ describe Nightfury::Identity::Base do
       d.key_prefix.should == 'dummy:1'
     end
 
+    it "should use store_as to generate key prefix if provided" do
+      d = Dummy.new(1)
+      flexmock(Dummy).should_receive(:store_as => :d)
+      d.key_prefix.should == 'd:1'
+    end
+
     describe "Dynamically generated metric" do
       it "should instantiate the right metric class" do
         Dummy.metric(:third_count)
