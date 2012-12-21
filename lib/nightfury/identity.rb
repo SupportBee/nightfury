@@ -10,7 +10,8 @@ module Nightfury
 
       class << self
         
-        attr_reader :metrics, :store_as
+        attr_reader :metrics, :tags
+        attr_accessor :store_as
 
         def name
           self.to_s.demodulize.underscore
@@ -26,18 +27,50 @@ module Nightfury
             end
           ENDOFMETHOD
         end
-
+        
+        def tag(name, options={})
+          @tags ||= {}
+          @tags[name] = options[:store_as] ? options[:store_as] : name
+        end
       end
       
-      attr_accessor :id
+      attr_accessor :id, :tags
 
-      def initialize(id)
+      def initialize(id, options={})
         @id = id
+        @tags = options[:tags]
       end
 
       def key_prefix
         store_name = self.class.store_as ? self.class.store_as : self.class.name
-        "#{store_name}:#{id}"
+        tag_ids = generate_tag_ids
+        tag_ids = tag_ids.nil? ? '' : ":#{tag_ids}"
+        "#{store_name}.#{id}#{tag_ids}"
+      end
+
+      private 
+
+      def generate_tag_ids
+        return nil unless tags
+        tag_values = {}
+        tags.each do |key, value|
+          store_name = self.class.tags[key]
+          next if store_name.nil?
+          tag_values[store_name] = value
+        end
+
+        tag_ids = nil
+        tag_values_sorted = tag_values.keys.sort
+        tag_values_sorted.each do |store_name|
+          tag = "#{store_name}.#{tag_values[store_name]}"
+          if tag_ids.nil?
+            tag_ids = tag
+          else
+            tag_ids = "#{tag_ids}:#{tag}"
+          end
+        end
+
+        tag_ids
       end
     end
   end
