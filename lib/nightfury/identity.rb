@@ -17,13 +17,13 @@ module Nightfury
           self.to_s.demodulize.underscore
         end
 
-        def metric(name, type = :value)
+        def metric(name, type = :value, options={})
           @metrics ||= {}
           @metrics[name] = {type: type}
-           
+          store_as = options[:store_as] ? ":#{options[:store_as]}" : 'nil' 
           class_eval <<-ENDOFMETHOD
             def #{name}
-              @_#{name} ||= METRIC_MAPPINGS[:#{type}].new(:#{name}, redis_key_prefix: key_prefix)
+              @_#{name} ||= METRIC_MAPPINGS[:#{type}].new(:#{name}, redis_key_prefix: key_prefix, store_as: #{store_as})
             end
           ENDOFMETHOD
         end
