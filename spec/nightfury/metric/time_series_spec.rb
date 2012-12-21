@@ -27,6 +27,11 @@ describe Nightfury::Metric::TimeSeries do
           result = ts_metric.get
           result[time_later.to_i.to_s].should == '2'
         end
+
+        it "should return nil if there are no data points" do
+          ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+          ts_metric.get.should be_nil
+        end
       end
 
       context "with timestamp" do
@@ -39,6 +44,11 @@ describe Nightfury::Metric::TimeSeries do
           result = ts_metric.get(time_now)
           result[time_now.to_i.to_s].should == '1'
         end
+
+        it "should return nil if there are no data points at the timestamp" do
+          ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+          ts_metric.get(Time.now).should be_nil
+        end
       end
     end
 
@@ -48,6 +58,11 @@ describe Nightfury::Metric::TimeSeries do
         # delete redis key
         ts_metric.redis.del ts_metric.redis_key
         ts_metric.get_range(Time.now, Time.now).should be_nil
+      end
+
+      it "should return an empty array if no data points are present in the specified ranges" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        ts_metric.get_range(Time.now, Time.now).should be_empty
       end
 
       it "should get all data points between the specified ranges" do
@@ -71,11 +86,16 @@ describe Nightfury::Metric::TimeSeries do
     end
 
     describe "#get_all" do
-      it "should retrun nil if metric key on redis is empty" do
+      it "should return nil if metric key on redis is empty" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         # delete redis key
         ts_metric.redis.del ts_metric.redis_key
         ts_metric.get_all.should be_nil
+      end
+
+      it "should return an empty array of there are no data points" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        ts_metric.get_all.should be_empty
       end
 
       it "should get all the data points in the series" do

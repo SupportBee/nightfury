@@ -21,10 +21,13 @@ module Nightfury
         data_point = ''
         if timestamp
           timestamp = timestamp.to_i
-          data_point = redis.zrangebyscore(redis_key, timestamp, timestamp).first
+          data_point = redis.zrangebyscore(redis_key, timestamp, timestamp, withscores: true).last
         else
-          data_point = redis.zrevrange(redis_key, 0, 0).first
+          data_point = redis.zrevrange(redis_key, 0, 0, withscores: true).last
         end
+      
+        return nil if data_point.nil?
+        return nil if data_point[1] == 0.0 
 
         time, data = decode_data_point(data_point)
         {time => data}
@@ -34,23 +37,32 @@ module Nightfury
         return nil unless redis.exists(redis_key)        
         start_time = start_time.to_i
         end_time = end_time.to_i
-        data_points = redis.zrangebyscore(redis_key, start_time, end_time)
+        data_points = redis.zrangebyscore(redis_key, start_time, end_time, withscores: true)
         decode_many_data_points(data_points)
       end
 
       def get_all
         return nil unless redis.exists(redis_key)        
-        data_points = redis.zrange(redis_key,1,-1)
+        data_points = redis.zrange(redis_key,1,-1, withscores: true)
         decode_many_data_points(data_points)         
       end
 
       def meta
-        json = redis.zrange(redis_key, 0, 0).first
-        JSON.parse(json)
+        unless @meta
+          json = redis.zrange(redis_key, 0, 0).first
+          @meta = JSON.parse(json)
+        end
+        @meta
       end
 
       def default_meta
         {}
+      end
+
+      protected
+
+      def before_set(value)
+        value
       end
 
       private
@@ -71,6 +83,7 @@ module Nightfury
       end
 
       def decode_data_point(data_point)
+        data_point = data_point.first
         colon_index = data_point.index(':')
 
         [
@@ -79,8 +92,9 @@ module Nightfury
         ]
       end
 
-      def before_set(value)
-        value
+      def save_meta
+        redis.zremrangebyscore redis_key, 0, 0
+        redis.zadd redis_key, 0, meta.to_json 
       end
 
       def init_time_series
