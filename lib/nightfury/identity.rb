@@ -4,7 +4,8 @@ module Nightfury
 
       METRIC_MAPPINGS = {
             :value => Nightfury::Metric::Value,
-            :time_series => Nightfury::Metric::TimeSeries
+            :time_series => Nightfury::Metric::TimeSeries,
+            :avg_time_series => Nightfury::Metric::AvgTimeSeries
           }
 
       class << self
