@@ -21,13 +21,15 @@ module Nightfury
         data_point = ''
         if timestamp
           timestamp = timestamp.to_i
-          data_point = redis.zrangebyscore(redis_key, timestamp, timestamp, withscores: true).last
+          data_point = redis.zrangebyscore(redis_key, timestamp, timestamp, withscores: true)
+          data_point = data_point.each_slice(2).map {|pair| pair }.last
         else
-          data_point = redis.zrevrange(redis_key, 0, 0, withscores: true).last
+          data_point = redis.zrevrange(redis_key, 0, 0, withscores: true)
+          data_point = data_point.each_slice(2).map {|pair| pair }.last
         end
       
         return nil if data_point.nil?
-        return nil if data_point[1] == 0.0 
+        return nil if data_point[1] == "0"
 
         time, data = decode_data_point(data_point)
         {time => data}
@@ -74,6 +76,7 @@ module Nightfury
       end
 
       def decode_many_data_points(data_points)
+        data_points = data_points.each_slice(2).map {|pair| pair }
         result = {}
         data_points.each do |data_point|
           time, data = decode_data_point(data_point)
