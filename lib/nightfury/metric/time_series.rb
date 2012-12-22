@@ -3,7 +3,7 @@ module Nightfury
     class TimeSeries < Base
 
       def initialize(name, options={})
-        super(name, options={})
+        super(name, options)
         init_time_series unless redis.exists(redis_key)
       end
 
