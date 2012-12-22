@@ -51,7 +51,7 @@ describe Nightfury::Metric::TimeSeries do
             ts_metric.get(Time.now).should be_nil
           end
 
-          it "should return the nearest data point" do
+          it "should return the nearest data point in the past" do
             ts_metric = Nightfury::Metric::TimeSeries.new(:time)
             set_time = Time.now - 60
             ts_metric.set(1, set_time)
