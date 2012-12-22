@@ -45,9 +45,19 @@ describe Nightfury::Metric::TimeSeries do
           result[time_now.to_i.to_s].should == '1'
         end
 
-        it "should return nil if there are no data points at the timestamp" do
-          ts_metric = Nightfury::Metric::TimeSeries.new(:time)
-          ts_metric.get(Time.now).should be_nil
+        context "no data point at the timestamp" do
+          it "should return nil if there are no data points in the time series" do
+            ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+            ts_metric.get(Time.now).should be_nil
+          end
+
+          it "should return the nearest data point" do
+            ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+            set_time = Time.now - 60
+            ts_metric.set(1, set_time)
+            result = ts_metric.get(Time.now)
+            result[set_time.to_i.to_s].should == '1'
+          end
         end
       end
     end

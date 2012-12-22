@@ -21,7 +21,7 @@ module Nightfury
         data_point = ''
         if timestamp
           timestamp = timestamp.to_i
-          data_point = redis.zrangebyscore(redis_key, timestamp, timestamp, withscores: true)
+          data_point = redis.zrangebyscore(redis_key, 0, timestamp, withscores: true)
           data_point = data_point.each_slice(2).map {|pair| pair }.last
         else
           data_point = redis.zrevrange(redis_key, 0, 0, withscores: true)
