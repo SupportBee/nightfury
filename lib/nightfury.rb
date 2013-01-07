@@ -39,6 +39,7 @@ require "nightfury/version"
 require "nightfury/metric"
 require "nightfury/metric/value"
 require "nightfury/metric/time_series"
+require "nightfury/metric/count_time_series"
 require "nightfury/metric/avg_time_series"
 require "nightfury/identity"
 
