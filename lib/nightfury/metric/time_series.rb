@@ -57,6 +57,11 @@ module Nightfury
         @meta
       end
 
+      def meta=(value)
+        @meta = value
+        save_meta
+      end
+
       def default_meta
         {}
       end

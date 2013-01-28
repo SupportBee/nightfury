@@ -8,6 +8,16 @@ describe Nightfury::Metric::TimeSeries do
     end
   end
 
+  describe "#meta=" do
+    it "should save the meta to redis" do
+      ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
+      ts_metric.meta.should == {}
+      ts_metric.meta= {'count' => 10}
+      ts_metric_reloaded = Nightfury::Metric::TimeSeries.new(:avg_time)
+      ts_metric_reloaded.meta.should == {'count' => 10}
+    end
+  end
+
   describe "Getter" do
     describe "#get" do
       it "should retrun nil if metric key on redis is empty" do
