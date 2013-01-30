@@ -7,8 +7,8 @@ module Nightfury
         init_time_series unless redis.exists(redis_key)
       end
 
-      def set(value, time=Time.now)
-        value = before_set(value)
+      def set(value, time=Time.now, options={})
+        value = before_set(value) unless options[:skip_before_set]
         # make sure the time_series is initialized.
         # It will not if the metric is removed and 
         # set is called on the smae object

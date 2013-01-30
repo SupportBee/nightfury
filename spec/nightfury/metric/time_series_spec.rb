@@ -135,6 +135,20 @@ describe Nightfury::Metric::TimeSeries do
   end
 
   describe "Setter" do
+    describe "before set" do
+      it "should call before_set, before adding the value to the timeline" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
+        flexmock(ts_metric).should_receive(:before_set).with(1).once
+        ts_metric.set(1)
+      end
+    
+      it "should not call before_set, before adding the value to the timeline if optiond ':skip_before_set' is provided" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
+        flexmock(ts_metric).should_receive(:before_set).with(1).never
+        ts_metric.set(1, Time.now, :skip_before_set => true)
+      end
+    end
+  
     describe "add the value to timeline" do
       it "should default time to current time" do
         time_now = Time.now 
