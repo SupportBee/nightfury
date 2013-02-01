@@ -36,8 +36,10 @@ module Nightfury
       end
       
       attr_accessor :id, :tags
+      attr_reader :redis
 
       def initialize(id, options={})
+        @redis = Nightfury.redis
         @id = id
         @tags = options[:tags]
       end
@@ -47,6 +49,10 @@ module Nightfury
         tag_ids = generate_tag_ids
         tag_ids = tag_ids.nil? ? '' : ":#{tag_ids}"
         "#{store_name}.#{id}#{tag_ids}"
+      end
+
+      def new_record?
+        redis.keys("#{key_prefix}*").empty?
       end
 
       private 

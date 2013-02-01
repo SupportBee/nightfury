@@ -41,6 +41,11 @@ describe Nightfury::Identity::Base do
       d.id.should == 1
     end
 
+    it "should respond to redis" do
+      d = Dummy.new(1)
+      d.redis.should == Nightfury.redis
+    end
+
     it "should generates a key prefix" do
       d = Dummy.new(1)
       d.key_prefix.should == 'dummy.1'
@@ -50,6 +55,16 @@ describe Nightfury::Identity::Base do
       d = Dummy.new(1)
       flexmock(Dummy).should_receive(:store_as => :d)
       d.key_prefix.should == 'd.1'
+    end
+
+    it "should be able tell if self is a new record" do
+      Dummy.metric(:new_metric)
+
+      d = Dummy.new(1)
+      d.should be_new_record
+      
+      d.new_metric.set(1)
+      d.should_not be_new_record
     end
 
     it "should include tags in the key prefix" do
