@@ -2,7 +2,7 @@ module Nightfury
   module Metric
     class Base      
 
-      ALLOWED_STEPS = [:minute, :hour, :week, :month, :year]
+      ALLOWED_STEPS = [:minute, :hour, :day, :week, :month]
 
       attr_reader :name, :redis, :redis_key_prefix, :store_as, :step
       

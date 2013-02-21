@@ -106,6 +106,7 @@ module Nightfury
         case step
           when :minute then time.round(60)
           when :hour then time.round(1.hour)
+          when :day then time.round(1.day)
           when :week then time.round(1.week)
           when :month then time.round(Time.days_in_month(time.month, time.year))
         end
