@@ -1,13 +1,17 @@
 module Nightfury
   module Metric
     class Base      
-      attr_reader :name, :redis, :redis_key_prefix, :store_as
+
+      ALLOWED_STEPS = [:minute, :hour, :week, :month, :year]
+
+      attr_reader :name, :redis, :redis_key_prefix, :store_as, :step
       
       def initialize(name, options={})
         @name = name
         @redis = Nightfury.redis
         @redis_key_prefix = options[:redis_key_prefix]
         @store_as = options[:store_as]
+        @step =  ALLOWED_STEPS.include?(options[:step]) ? options[:step] : :minute
       end
 
       def redis_key

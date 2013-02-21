@@ -31,11 +31,11 @@ describe Nightfury::Metric::TimeSeries do
         it "should get the most recent data point" do
           ts_metric = Nightfury::Metric::TimeSeries.new(:time)
           time_now = Time.now
-          time_later = time_now + 10
+          time_later = time_now + 60
           ts_metric.set(1, time_now)
           ts_metric.set(2, time_later)
           result = ts_metric.get
-          result[time_later.to_i.to_s].should == '2'
+          result.values.first.should == '2'
         end
 
         it "should return nil if there are no data points" do
@@ -45,14 +45,14 @@ describe Nightfury::Metric::TimeSeries do
       end
 
       context "with timestamp" do
-        it "should get the data point at the time stamp" do
+        it "should get the data point at the nearest time step" do
           ts_metric = Nightfury::Metric::TimeSeries.new(:time)
           time_now = Time.now
-          time_later = time_now + 10
+          time_later = time_now + 60
           ts_metric.set(1, time_now)
           ts_metric.set(2, time_later)
           result = ts_metric.get(time_now)
-          result[time_now.to_i.to_s].should == '1'
+          result.values.first.should == '1'
         end
 
         context "no data point at the timestamp" do
@@ -66,7 +66,7 @@ describe Nightfury::Metric::TimeSeries do
             set_time = Time.now - 60
             ts_metric.set(1, set_time)
             result = ts_metric.get(Time.now)
-            result[set_time.to_i.to_s].should == '1'
+            result.values.first.should == '1'
           end
         end
       end
@@ -92,16 +92,14 @@ describe Nightfury::Metric::TimeSeries do
 
         10.times do |i|
           ts_metric.set(i, loop_time)
-          loop_time = loop_time + 1
+          loop_time = loop_time + 61
         end
 
-        start_time = time + 3
-        end_time = time + 5
+        start_time = time + (3*60)
+        end_time = time + (5*60)
 
         result = ts_metric.get_range(start_time, end_time)
-        result[start_time.to_i.to_s].should == '3'
-        result[(start_time.to_i + 1).to_s].should == '4'
-        result[end_time.to_i.to_s].should == '5'
+        result.values.should == ['3','4','5']
       end
     end
 
@@ -125,7 +123,7 @@ describe Nightfury::Metric::TimeSeries do
 
         10.times do |i|
           ts_metric.set(i, loop_time)
-          loop_time = loop_time + 1
+          loop_time = loop_time + 61
         end
 
         result = ts_metric.get_all
@@ -150,13 +148,13 @@ describe Nightfury::Metric::TimeSeries do
     end
   
     describe "add the value to timeline" do
-      it "should default time to current time" do
+      it "should default time to the step near the current time" do
         time_now = Time.now 
         ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
 
         flexmock(ts_metric.redis).should_receive(:zadd)
                                  .with(ts_metric.redis_key, 
-                                       time_now.to_i, 
+                                       time_now.round(60).to_i, 
                                        FlexMock.any)
                                  .once
 
@@ -166,28 +164,16 @@ describe Nightfury::Metric::TimeSeries do
         Timecop.return
       end
 
-      it "should add at specified time" do
+      it "should add at the step near to specified time" do
         time = Time.now - 60
         ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
 
         flexmock(ts_metric.redis).should_receive(:zadd)
                                  .with(ts_metric.redis_key, 
-                                       time.to_i, 
+                                       time.round(60).to_i, 
                                        FlexMock.any)
                                  .once
 
-        ts_metric.set(1, time)
-      end
-
-      it "should add the time to the value to avoid duplicate value in the set" do
-        time = Time.now
-        ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
-
-        flexmock(ts_metric.redis).should_receive(:zadd)
-                                 .with(FlexMock.any, 
-                                       FlexMock.any, 
-                                       "#{time.to_i}:1")
-                                 .once
         ts_metric.set(1, time)
       end
     end

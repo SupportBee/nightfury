@@ -20,7 +20,7 @@ module Nightfury
         return nil unless redis.exists(redis_key)
         data_point = ''
         if timestamp
-          timestamp = timestamp.to_i
+          timestamp = get_step_time(timestamp).to_i
           data_point = redis.zrangebyscore(redis_key, 0, timestamp, withscores: true)
           data_point = data_point.each_slice(2).map {|pair| pair }.last
         else
@@ -37,8 +37,8 @@ module Nightfury
 
       def get_range(start_time, end_time)
         return nil unless redis.exists(redis_key)        
-        start_time = start_time.to_i
-        end_time = end_time.to_i
+        start_time = get_step_time(start_time).to_i
+        end_time   = get_step_time(end_time).to_i
         data_points = redis.zrangebyscore(redis_key, start_time, end_time, withscores: true)
         decode_many_data_points(data_points)
       end
@@ -75,9 +75,8 @@ module Nightfury
       private
       
       def add_value_to_timeline(value, time)
-        time = time.to_i
-        value = "#{time}:#{value}"
-        redis.zadd redis_key, time, value
+        timestamp = get_step_time(time).to_i
+        redis.zadd redis_key, timestamp, value
       end
 
       def decode_many_data_points(data_points)
@@ -91,13 +90,7 @@ module Nightfury
       end
 
       def decode_data_point(data_point)
-        data_point = data_point.first
-        colon_index = data_point.index(':')
-
-        [
-          data_point[0...colon_index], 
-          data_point[colon_index+1..-1]
-        ]
+        [data_point[1], data_point[0]]
       end
 
       def save_meta
@@ -107,6 +100,15 @@ module Nightfury
 
       def init_time_series
         redis.zadd redis_key, 0, default_meta.to_json
+      end
+
+      def get_step_time(time)
+        case step
+          when :minute then time.round(60)
+          when :hour then time.round(1.hour)
+          when :week then time.round(1.week)
+          when :month then time.round(Time.days_in_month(time.month, time.year))
+        end
       end
     end
   end

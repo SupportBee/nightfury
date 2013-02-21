@@ -4,7 +4,21 @@ require 'json'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/class/attribute'
 require 'active_support/core_ext/string/inflections'
+require 'active_support/core_ext/time/calculations'
+require 'active_support/core_ext/date/calculations'
+require 'active_support/core_ext/date_time/calculations'
+require 'active_support/core_ext/numeric/time'
 require 'active_support/concern'
+
+class Time
+  def round(seconds = 60)
+    Time.at((self.to_f / seconds).round * seconds)
+  end
+
+  def floor(seconds = 60)
+    Time.at((self.to_f / seconds).floor * seconds)
+  end
+end
 
 module Nightfury
   class << self
