@@ -154,7 +154,7 @@ describe Nightfury::Metric::TimeSeries do
 
         flexmock(ts_metric.redis).should_receive(:zadd)
                                  .with(ts_metric.redis_key, 
-                                       time_now.round(60).to_i, 
+                                       round_time(time_now, 60).to_i, 
                                        FlexMock.any)
                                  .once
 
@@ -170,7 +170,7 @@ describe Nightfury::Metric::TimeSeries do
 
         flexmock(ts_metric.redis).should_receive(:zadd)
                                  .with(ts_metric.redis_key, 
-                                       time.round(60).to_i, 
+                                       round_time(time, 60).to_i, 
                                        FlexMock.any)
                                  .once
 

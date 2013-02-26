@@ -33,3 +33,7 @@ RSpec.configure do |config|
     REDIS_CLIENT.flushdb
   end
 end
+
+def round_time(time, seconds=60)
+  Nightfury::Metric::TimeSeries.round_time(time, 60)
+end

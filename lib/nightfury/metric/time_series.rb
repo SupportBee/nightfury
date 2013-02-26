@@ -1,6 +1,10 @@
 module Nightfury
   module Metric
     class TimeSeries < Base
+      
+      def self.round_time(time, seconds=60)
+        Time.at((time.to_f / seconds).round * seconds)
+      end
 
       def initialize(name, options={})
         super(name, options)
@@ -102,13 +106,17 @@ module Nightfury
         redis.zadd redis_key, 0, default_meta.to_json
       end
 
+      def round_time(time, seconds=60)
+        self.class.round_time(time, seconds)
+      end
+
       def get_step_time(time)
         case step
-          when :minute then time.round(60)
-          when :hour then time.round(1.hour)
-          when :day then time.round(1.day)
-          when :week then time.round(1.week)
-          when :month then time.round(Time.days_in_month(time.month, time.year))
+          when :minute then round_time(time, 60)
+          when :hour then round_time(time, 1.hour)
+          when :day then round_time(time, 1.day)
+          when :week then round_time(time, 1.week)
+          when :month then round_time(time, Time.days_in_month(time.month, time.year))
         end
       end
     end

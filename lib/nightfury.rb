@@ -10,26 +10,6 @@ require 'active_support/core_ext/date_time/calculations'
 require 'active_support/core_ext/numeric/time'
 require 'active_support/concern'
 
-class Time
-  def round(seconds = 60)
-    Time.at((self.to_f / seconds).round * seconds)
-  end
-
-  def floor(seconds = 60)
-    Time.at((self.to_f / seconds).floor * seconds)
-  end
-end
-
-class DateTime
-  def round(seconds = 60)
-    Time.at((self.to_f / seconds).round * seconds).to_datetime
-  end
-
-  def floor(seconds = 60)
-    Time.at((self.to_f / seconds).floor * seconds).to_datetime
-  end
-end
-
 module Nightfury
   class << self
     attr_accessor :redis, :namespace
