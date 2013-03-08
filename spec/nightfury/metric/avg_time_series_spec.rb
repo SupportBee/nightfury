@@ -1,6 +1,19 @@
 require 'spec_helper'
 
 describe Nightfury::Metric::AvgTimeSeries do
+  describe "#get_padded_range" do
+    it "should fill the missing data points" do
+      count_series = Nightfury::Metric::AvgTimeSeries.new(:count)
+      start_time = Time.new(2013,1,1,0,0,0)
+      end_time = start_time + 120
+      missing_time = start_time + 60
+
+      count_series.set(1, start_time)
+      count_series.set(2, end_time)
+      count_series.get_padded_range(start_time, end_time)[missing_time.to_i.to_s].should == "0.0"
+    end
+  end
+
   it "should calculate avg in buckets defined by step" do
     avg_metric = Nightfury::Metric::AvgTimeSeries.new(:avg)
     first_bucket_time = Time.now

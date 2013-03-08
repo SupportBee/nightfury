@@ -1,6 +1,19 @@
 require 'spec_helper'
 
 describe Nightfury::Metric::CountTimeSeries do
+  describe "#get_padded_range" do
+    it "should fill the missing data points" do
+      count_series = Nightfury::Metric::CountTimeSeries.new(:count)
+      start_time = Time.new(2013,1,1,0,0,0)
+      end_time = start_time + 120
+      missing_time = start_time + 60
+
+      count_series.set(1, start_time)
+      count_series.set(2, end_time)
+      count_series.get_padded_range(start_time, end_time)[missing_time.to_i.to_s].should == "1"
+    end
+  end
+
   describe "Incr" do
     context "Has data points" do
       it "should be able to increment value by 1 at the current timestamp by default" do

@@ -61,9 +61,9 @@ module Nightfury
 
       def get_range(start_time, end_time)
         return nil unless redis.exists(redis_key)        
-        start_time = get_step_time(start_time).to_i
-        end_time   = get_step_time(end_time).to_i
-        data_points = redis.zrangebyscore(redis_key, start_time, end_time, withscores: true)
+        start_time = get_step_time(start_time)
+        end_time   = get_step_time(end_time)
+        data_points = redis.zrangebyscore(redis_key, start_time.to_i, end_time.to_i, withscores: true)
         decode_many_data_points(data_points)
       end
 
@@ -105,10 +105,11 @@ module Nightfury
       def each_timestamp(start_time, end_time, &block)
         start_time = get_step_time(start_time).to_i
         end_time = get_step_time(end_time).to_i
-        current_time = start_time
-        start_time.step(end_time, seconds_in_step(Time.at(current_time))) do |timestamp|
-          yield(timestamp)
-          current_time = timestamp
+        current_step_time, last_step_time = start_time, nil
+        start_time.step(end_time, seconds_in_step(Time.at(current_step_time))) do
+          yield(current_step_time, last_step_time)
+          last_step_time = current_step_time
+          current_step_time += seconds_in_step(Time.at(current_step_time))
         end
       end
 

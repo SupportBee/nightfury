@@ -26,9 +26,11 @@ describe Nightfury::Metric::TimeSeries do
       mid_time = start_time + 60
       end_time = mid_time + 60
 
+      expected = [[start_time.to_i, nil], [mid_time.to_i, start_time.to_i], [end_time.to_i, mid_time.to_i]]
+
       expect { |b|
         ts_metric.each_timestamp(start_time, end_time, &b)
-      }.to yield_successive_args(start_time.to_i, mid_time.to_i, end_time.to_i)
+      }.to yield_successive_args(*expected)
     end
   end
 
