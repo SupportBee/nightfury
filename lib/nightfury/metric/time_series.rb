@@ -5,6 +5,16 @@ module Nightfury
       def self.floor_time(time, seconds=60)
         Time.at((time.to_f / seconds).floor * seconds)
       end
+      
+      def self.seconds_in_step(step_name, time)
+        {
+          minute: 60,
+          hour: 1.hour,
+          day: 1.day,
+          week: 1.week,
+          month: Time.days_in_month(time.month, time.year)
+        }[step_name]
+      end
 
       def initialize(name, options={})
         super(name, options)
@@ -80,6 +90,28 @@ module Nightfury
         {}
       end
 
+      def seconds_in_step(time)
+        self.class.seconds_in_step(step, time)
+      end
+
+      def floor_time(time, seconds=60)
+        self.class.floor_time(time, seconds)
+      end
+
+      def get_step_time(time)
+        floor_time(time, seconds_in_step(time))
+      end
+
+      def each_timestamp(start_time, end_time, &block)
+        start_time = get_step_time(start_time).to_i
+        end_time = get_step_time(end_time).to_i
+        current_time = start_time
+        start_time.step(end_time, seconds_in_step(Time.at(current_time))) do |timestamp|
+          yield(timestamp)
+          current_time = timestamp
+        end
+      end
+
       protected
 
       def before_set(value, time)
@@ -89,21 +121,7 @@ module Nightfury
       def decode_data_point(data_point)
         [data_point[1], data_point[0], {}]
       end
-
-      def floor_time(time, seconds=60)
-        self.class.floor_time(time, seconds)
-      end
-
-      def get_step_time(time)
-        case step
-          when :minute then floor_time(time, 60)
-          when :hour then floor_time(time, 1.hour)
-          when :day then floor_time(time, 1.day)
-          when :week then floor_time(time, 1.week)
-          when :month then floor_time(time, Time.days_in_month(time.month, time.year))
-        end
-      end
-
+      
       private
       
       def add_value_to_timeline(value, time)

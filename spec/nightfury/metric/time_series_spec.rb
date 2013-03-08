@@ -18,6 +18,20 @@ describe Nightfury::Metric::TimeSeries do
     end
   end
 
+  describe "#each_timestamp" do
+    it "should iterate through each timestamp between a start and a end time" do
+      ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
+
+      start_time = Time.new(2013,1,1,0,0,0)
+      mid_time = start_time + 60
+      end_time = mid_time + 60
+
+      expect { |b|
+        ts_metric.each_timestamp(start_time, end_time, &b)
+      }.to yield_successive_args(start_time.to_i, mid_time.to_i, end_time.to_i)
+    end
+  end
+
   describe "Getter" do
     describe "#get" do
       it "should retrun nil if metric key on redis is empty" do
@@ -179,7 +193,7 @@ describe Nightfury::Metric::TimeSeries do
       it "should call before_set, before adding the value to the timeline" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
         time = Time.now
-        flexmock(ts_metric).should_receive(:before_set).with(1, time).once
+        flexmock(ts_metric).should_receive(:before_set).with(1, time).and_return([1,time]).once
         ts_metric.set(1, time)
       end
     

@@ -5,7 +5,7 @@ module Nightfury
       protected
 
       def before_set(value, time)
-        step_time = get_step_time(time).to_i
+        step_time = get_step_time(time)
         data_point, meta_value = get_exact(step_time, true)
         current_count = current_total = 0.0
         unless data_point.nil?
