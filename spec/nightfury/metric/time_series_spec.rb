@@ -27,6 +27,15 @@ describe Nightfury::Metric::TimeSeries do
         ts_metric.get.should be_nil
       end
 
+      context "with meta" do
+        it "should also return the meta part of the data point" do
+          ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+          time_now = Time.now
+          ts_metric.set(1, time_now)
+          ts_metric.get(time_now, true)[1].should == {}
+        end
+      end
+
       context "without timestamp" do
         it "should get the most recent data point" do
           ts_metric = Nightfury::Metric::TimeSeries.new(:time)
@@ -70,6 +79,39 @@ describe Nightfury::Metric::TimeSeries do
           end
         end
       end
+    end
+
+    describe "#get_exact" do
+      it "should get the data_point at the timestamp" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        time = Time.now
+        ts_metric.set(1, time)
+        result = ts_metric.get_exact(time)
+        result.values.first.should == '1'
+      end
+
+      it "should return data point's meta if specified" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        time = Time.now
+        ts_metric.set(1, time)
+        result = ts_metric.get_exact(time, true)
+        result[1].should == {}
+      end
+
+      it "should return nil if there is no data_point at the timestamp" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        time = Time.now
+        ts_metric.set(1, time)
+        result = ts_metric.get_exact(time+61)
+        result.should be_nil
+      end
+
+      it "should retrun nil if metric key on redis is empty" do
+        ts_metric = Nightfury::Metric::TimeSeries.new(:time)
+        # delete redis key
+        ts_metric.redis.del ts_metric.redis_key
+        ts_metric.get_exact(Time.now).should be_nil
+      end      
     end
 
     describe "#get_range" do
@@ -136,8 +178,9 @@ describe Nightfury::Metric::TimeSeries do
     describe "before set" do
       it "should call before_set, before adding the value to the timeline" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
-        flexmock(ts_metric).should_receive(:before_set).with(1).once
-        ts_metric.set(1)
+        time = Time.now
+        flexmock(ts_metric).should_receive(:before_set).with(1, time).once
+        ts_metric.set(1, time)
       end
     
       it "should not call before_set, before adding the value to the timeline if optiond ':skip_before_set' is provided" do

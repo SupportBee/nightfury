@@ -12,7 +12,7 @@ module Nightfury
       end
 
       def set(value, time=Time.now, options={})
-        value = before_set(value) unless options[:skip_before_set]
+        value, time = before_set(value, time) unless options[:skip_before_set]
         # make sure the time_series is initialized.
         # It will not if the metric is removed and 
         # set is called on the smae object
@@ -20,7 +20,7 @@ module Nightfury
         add_value_to_timeline(value, time)
       end
       
-      def get(timestamp=nil)
+      def get(timestamp=nil, get_meta=false)
         return nil unless redis.exists(redis_key)
         data_point = ''
         if timestamp
@@ -32,11 +32,21 @@ module Nightfury
           data_point = data_point.each_slice(2).map {|pair| pair }.last
         end
       
-        return nil if data_point.nil?
-        return nil if data_point[1] == "0"
+        return get_meta ? [nil, {}] : nil if data_point.nil?
+        return get_meta ? [nil, {}] : nil if data_point[1] == "0"
 
-        time, data = decode_data_point(data_point)
-        {time => data}
+        time, data, meta_value = decode_data_point(data_point)
+        get_meta ? [{time => data}, meta_value] : {time => data}
+      end
+
+      def get_exact(timestamp, get_meta=false)
+        return nil unless redis.exists(redis_key)
+        timestamp = get_step_time(timestamp).to_i
+        data_point = redis.zrangebyscore(redis_key, timestamp, timestamp, withscores: true)
+        data_point = data_point.each_slice(2).map {|pair| pair }.last
+        return get_meta ? [nil, {}] : nil if data_point.nil?
+        time, data, meta_value = decode_data_point(data_point)
+        result = get_meta ? [{time => data}, meta_value] : {time => data}
       end
 
       def get_range(start_time, end_time)
@@ -72,8 +82,26 @@ module Nightfury
 
       protected
 
-      def before_set(value)
-        value
+      def before_set(value, time)
+        [value, time]
+      end
+
+      def decode_data_point(data_point)
+        [data_point[1], data_point[0], {}]
+      end
+
+      def round_time(time, seconds=60)
+        self.class.round_time(time, seconds)
+      end
+
+      def get_step_time(time)
+        case step
+          when :minute then round_time(time, 60)
+          when :hour then round_time(time, 1.hour)
+          when :day then round_time(time, 1.day)
+          when :week then round_time(time, 1.week)
+          when :month then round_time(time, Time.days_in_month(time.month, time.year))
+        end
       end
 
       private
@@ -91,11 +119,7 @@ module Nightfury
           result[time] = data
         end
         result
-      end
-
-      def decode_data_point(data_point)
-        [data_point[1], data_point[0]]
-      end
+      end 
 
       def save_meta
         redis.zremrangebyscore redis_key, 0, 0
@@ -106,19 +130,6 @@ module Nightfury
         redis.zadd redis_key, 0, default_meta.to_json
       end
 
-      def round_time(time, seconds=60)
-        self.class.round_time(time, seconds)
-      end
-
-      def get_step_time(time)
-        case step
-          when :minute then round_time(time, 60)
-          when :hour then round_time(time, 1.hour)
-          when :day then round_time(time, 1.day)
-          when :week then round_time(time, 1.week)
-          when :month then round_time(time, Time.days_in_month(time.month, time.year))
-        end
-      end
     end
   end
 end
