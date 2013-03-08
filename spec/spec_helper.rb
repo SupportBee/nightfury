@@ -34,6 +34,6 @@ RSpec.configure do |config|
   end
 end
 
-def round_time(time, seconds=60)
-  Nightfury::Metric::TimeSeries.round_time(time, 60)
+def floor_time(time, seconds=60)
+  Nightfury::Metric::TimeSeries.floor_time(time, 60)
 end

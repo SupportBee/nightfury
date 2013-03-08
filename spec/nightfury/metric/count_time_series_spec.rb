@@ -39,7 +39,7 @@ describe Nightfury::Metric::CountTimeSeries do
         # Add a data point
         count_series.set(1, time_now - 10)
         count_series.incr(1,time_later)
-        count_series.get.should == { round_time(time_later, 60).to_i.to_s => "2"}
+        count_series.get.should == { floor_time(time_later, 60).to_i.to_s => "2"}
       end
     end
 
@@ -48,7 +48,7 @@ describe Nightfury::Metric::CountTimeSeries do
         count_series = Nightfury::Metric::CountTimeSeries.new(1)
         time_now = Time.now
         count_series.incr(2, time_now)
-        count_series.get.should == { round_time(time_now, 60).to_i.to_s => "2"}
+        count_series.get.should == { floor_time(time_now, 60).to_i.to_s => "2"}
       end
     end
   end
@@ -91,7 +91,7 @@ describe Nightfury::Metric::CountTimeSeries do
         # Add a data point
         count_series.set(1, time_now - 10)
         count_series.decr(1,time_later)
-        count_series.get.should == { round_time(time_later, 60).to_i.to_s => "0"}
+        count_series.get.should == { floor_time(time_later, 60).to_i.to_s => "0"}
       end
     end
 
@@ -100,7 +100,7 @@ describe Nightfury::Metric::CountTimeSeries do
         count_series = Nightfury::Metric::CountTimeSeries.new(1)
         time_now = Time.now
         count_series.decr(2, time_now)
-        count_series.get.should == { round_time(time_now, 60).to_i.to_s => "-2"}
+        count_series.get.should == { floor_time(time_now, 60).to_i.to_s => "-2"}
       end
     end
   end
