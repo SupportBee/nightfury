@@ -22,9 +22,10 @@ module Nightfury
           @metrics ||= {}
           @metrics[name] = {type: type}
           store_as = options[:store_as] ? ":#{options[:store_as]}" : 'nil' 
+          step = options[:step] ? ":#{options[:step]}" : ":minute"
           class_eval <<-ENDOFMETHOD
             def #{name}
-              @_#{name} ||= METRIC_MAPPINGS[:#{type}].new(:#{name}, redis_key_prefix: key_prefix, store_as: #{store_as})
+              @_#{name} ||= METRIC_MAPPINGS[:#{type}].new(:#{name}, redis_key_prefix: key_prefix, store_as: #{store_as}, step: #{step})
             end
           ENDOFMETHOD
         end

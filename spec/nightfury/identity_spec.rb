@@ -78,13 +78,14 @@ describe Nightfury::Identity::Base do
 
     describe "Dynamically generated metric" do
       it "should instantiate the right metric class" do
-        Dummy.metric(:third_count, :value, store_as: :t)
+        Dummy.metric(:third_count, :value, store_as: :t, step: :day)
         d = Dummy.new(1)
         metric_object = d.third_count
         metric_object.should be_kind_of(Nightfury::Metric::Value)
         metric_object.name.should == :third_count
         metric_object.redis_key_prefix.should == 'dummy.1'
         metric_object.store_as.should == :t
+        metric_object.step.should == :day
       end
     end
   end
