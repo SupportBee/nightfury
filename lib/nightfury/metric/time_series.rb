@@ -120,13 +120,21 @@ module Nightfury
       end
 
       def decode_data_point(data_point)
-        [data_point[1], data_point[0], {}]
+        data_point = data_point.first
+        colon_index = data_point.index(':')
+        [
+	        data_point[0...colon_index], 
+	        data_point[colon_index+1..-1],
+          {}
+        ]
       end
       
       private
       
       def add_value_to_timeline(value, time)
         timestamp = get_step_time(time).to_i
+        redis.zremrangebyscore redis_key, timestamp, timestamp
+        value = "#{timestamp}:#{value}"
         redis.zadd redis_key, timestamp, value
       end
 

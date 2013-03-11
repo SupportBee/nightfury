@@ -30,7 +30,8 @@ module Nightfury
       end
 
       def decode_data_point(data_point)
-        current_count, current_total, data = data_point[0].split(',')
+        time, data_with_meta = super(data_point)
+        current_count, current_total, data = data_with_meta.split(',')
         [data_point[1], data, {current_count: current_count, current_total: current_total}]
       end
     end

@@ -7,32 +7,28 @@ module Nightfury
           current_step_time = current_step_time.to_s
           last_step_time = last_step_time.to_s
           next if data_points[current_step_time]
-          data_points[current_step_time] = data_points[last_step_time]
+          data_points[current_step_time] = 0.to_s
         end
         data_points
       end
 
-      def incr(step=1, timestamp = Time.now)
-        last_data_point = get
-        if last_data_point
-          time, value = last_data_point.flatten
-          value = value.to_i + step
-          set(value, timestamp)
-        else
-          set(step, timestamp)
-        end
+      def incr(step=1, time = Time.now)
+        value = 0
+        step_time = get_step_time(time)
+        data_point = get_exact(step_time)
+        value = data_point.flatten[1] unless data_point.nil?
+        updated_value = value.to_i + step
+        set(updated_value, step_time) 
       end 
 
-      def decr(step=1, timestamp = Time.now)
-        last_data_point = get
-        if last_data_point
-          time, value = last_data_point.flatten
-          value = value.to_i - step
-          set(value, timestamp)
-        else
-          set(-step, timestamp)
-        end
-      end 
+      def decr(step=1, time = Time.now)
+        value = 0
+        step_time = get_step_time(time)
+        data_point = get_exact(step_time)
+        value = data_point.flatten[1] unless data_point.nil?
+        updated_value = value.to_i - step
+        set(updated_value, step_time)
+      end
     end
   end
 end
