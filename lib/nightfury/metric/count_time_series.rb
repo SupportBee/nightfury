@@ -9,7 +9,7 @@ module Nightfury
           next if data_points[current_step_time]
           data_points[current_step_time] = 0.to_s
         end
-        data_points
+        Hash[data_points.sort]
       end
 
       def incr(step=1, time = Time.now)

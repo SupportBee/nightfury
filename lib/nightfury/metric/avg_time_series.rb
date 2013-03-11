@@ -9,7 +9,7 @@ module Nightfury
           next if data_points[current_step_time]
           data_points[current_step_time] = '0.0'
         end
-        data_points
+        Hash[data_points.sort]
       end
 
       protected
