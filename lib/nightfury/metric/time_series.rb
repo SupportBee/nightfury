@@ -36,14 +36,14 @@ module Nightfury
         if timestamp
           timestamp = get_step_time(timestamp).to_i
           data_point = redis.zrangebyscore(redis_key, 0, timestamp, withscores: true)
-          data_point = data_point.each_slice(2).map {|pair| pair }.last
+          data_point = data_point.last
         else
           data_point = redis.zrevrange(redis_key, 0, 0, withscores: true)
-          data_point = data_point.each_slice(2).map {|pair| pair }.last
+          data_point = data_point.last
         end
       
         return get_meta ? [nil, {}] : nil if data_point.nil?
-        return get_meta ? [nil, {}] : nil if data_point[1] == "0"
+        return get_meta ? [nil, {}] : nil if data_point[1] == 0.0
 
         time, data, meta_value = decode_data_point(data_point)
         get_meta ? [{time => data}, meta_value] : {time => data}
@@ -53,7 +53,7 @@ module Nightfury
         return nil unless redis.exists(redis_key)
         timestamp = get_step_time(timestamp).to_i
         data_point = redis.zrangebyscore(redis_key, timestamp, timestamp, withscores: true)
-        data_point = data_point.each_slice(2).map {|pair| pair }.last
+        data_point = data_point.last
         return get_meta ? [nil, {}] : nil if data_point.nil?
         time, data, meta_value = decode_data_point(data_point)
         result = get_meta ? [{time => data}, meta_value] : {time => data}
@@ -139,7 +139,7 @@ module Nightfury
       end
 
       def decode_many_data_points(data_points)
-        data_points = data_points.each_slice(2).map {|pair| pair }
+        #data_points = data_points.each_slice(2).map {|pair| pair }
         result = {}
         data_points.each do |data_point|
           time, data = decode_data_point(data_point)

@@ -32,7 +32,7 @@ module Nightfury
       def decode_data_point(data_point)
         time, data_with_meta = super(data_point)
         current_count, current_total, data = data_with_meta.split(',')
-        [data_point[1], data, {current_count: current_count, current_total: current_total}]
+        [data_point[1].to_i.to_s, data, {current_count: current_count, current_total: current_total}]
       end
     end
   end
