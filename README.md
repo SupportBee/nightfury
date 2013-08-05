@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/avinasha/nightfury.png)](https://waffle.io/avinasha/nightfury)  
 # Nightfury
 
 **This gem is not yet production ready**
