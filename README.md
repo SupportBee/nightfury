@@ -1,6 +1,6 @@
-# Nightfury
+[![Stories in Ready](https://badge.waffle.io/avinasha/nightfury.png)](http://waffle.io/avinasha/nightfury)
 
-**This gem is not yet production ready**
+# Nightfury
 
 ## Concept
 
