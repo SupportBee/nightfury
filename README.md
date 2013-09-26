@@ -9,9 +9,9 @@ to store differnt metrics in a time series or as a single value which can be eas
 
 ### Identity
 
-Like a company or a ticket or a user (anything that we want stats on very quickly)
-Has an id (can auto-generate but generally provided so you can map it to your db ids etc)
-Has metrics
+* Like a company or a ticket or a user (anything that we want stats on very quickly)
+* Has an id (can auto-generate but generally provided so you can map it to your db ids etc)
+* Has metrics
 
 ### Metrics
 
@@ -24,7 +24,7 @@ A identity has many metrics.
 ### Tags
 
 Identities can be tagged and have multiple tags
-You can ask for stats for identities with certain tags over a particular time range (if asking for metrics that are series)
+You can ask for stats for identities with certain tags over a particular time range (if the metric is a series)
 
 ## Usage
 
