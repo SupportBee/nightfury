@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'nightfury'
 
+# NightFury makes use Redis.current Redis client
 REDIS_CLIENT = Redis.new(:db => 15)
 Redis.current = REDIS_CLIENT
 
@@ -33,6 +34,7 @@ c.first_response_time.set(2,time_now - 10)
 puts "#get; latest value: \n #{c.first_response_time.get}"
 puts "#get(timestamp); value at the timestamp: \n #{c.first_response_time.get(time_now - 10)}"
 puts "#get_range(start_time, end_time); returns values with condition start_time >= value <= end_time \n #{c.first_response_time.get_range(time_now - 15, time_now - 5)}"
+puts "#get_padded_range(start_time, end_time); returns values with condition start_time >= value <= end_time. Adds padding for missing steps. \n #{c.first_response_time.get_range(time_now - 15, time_now - 5)}"
 puts "#get_all; returns all values \n #{c.first_response_time.get_all}"
 
 
