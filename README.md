@@ -112,6 +112,11 @@ Or install it yourself as:
 
     $ gem install nightfury
 
+## Running in the wild
+
+We built NightFury to power the reporting of [SupportBee](https://supportbee.com)  
+It is also used to provide analytics in [WhatsNew](https://whatsnew.io)
+
 ## Contributing
 
 1. Fork it
