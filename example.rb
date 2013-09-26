@@ -11,7 +11,7 @@ class CompanyIdentity < Nightfury::Identity::Base
   # Defining metric: 
   # #metric(name, type)
   # type defaults to :value
-  metric :first_response_time, :time_series
+  metric :first_response_time, :time_series, step: :day
   metric :ticket_count
 end
 
