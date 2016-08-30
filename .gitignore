@@ -78,3 +78,4 @@ bundler_stubs/
 *.swl
 public/stylesheets/common/tinymce.css
 public/stylesheets/common/tinymce_ui.css
+vendor/bundle/
