@@ -12,6 +12,5 @@ gemspec
 
 gem 'rspec'
 gem 'flexmock', '1.0.4'
-gem 'mock_redis'
 gem 'timecop'
 gem 'pry'
