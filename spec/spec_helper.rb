@@ -4,6 +4,8 @@ require 'bundler/setup'
 require 'nightfury'
 require 'timecop'
 
+require 'pry'
+
 # Start our own redis-server to avoid corrupting any others
 REDIS_BIN  = 'redis-server'
 REDIS_PORT = ENV['REDIS_PORT'] || 9212
