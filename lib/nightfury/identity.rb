@@ -10,7 +10,7 @@ module Nightfury
           }
 
       class << self
-        
+
         attr_reader :metrics, :tags
         attr_accessor :store_as
 
@@ -21,7 +21,7 @@ module Nightfury
         def metric(name, type = :value, options={})
           @metrics ||= {}
           @metrics[name] = {type: type}
-          store_as = options[:store_as] ? ":#{options[:store_as]}" : 'nil' 
+          store_as = options[:store_as] ? ":#{options[:store_as]}" : 'nil'
           step = options[:step] ? ":#{options[:step]}" : ":minute"
           class_eval <<-ENDOFMETHOD
             def #{name}
@@ -29,13 +29,13 @@ module Nightfury
             end
           ENDOFMETHOD
         end
-        
+
         def tag(name, options={})
           @tags ||= {}
           @tags[name] = options[:store_as] ? options[:store_as] : name
         end
       end
-      
+
       attr_accessor :id, :tags
       attr_reader :redis
 
@@ -52,11 +52,19 @@ module Nightfury
         "#{store_name}.#{id}#{tag_ids}"
       end
 
-      def new_record?
-        redis.keys("#{key_prefix}*").empty?
+      def keys
+        redis.keys("#{key_prefix}*")
       end
 
-      private 
+      def new_record?
+        keys.empty?
+      end
+
+      def delete
+        redis.del(keys)
+      end
+
+      private
 
       def generate_tag_ids
         return nil unless tags
