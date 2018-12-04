@@ -3,11 +3,11 @@ module Nightfury
     class Base
 
       METRIC_MAPPINGS = {
-            :value => Nightfury::Metric::Value,
-            :time_series => Nightfury::Metric::TimeSeries,
-            :avg_time_series => Nightfury::Metric::AvgTimeSeries,
-            :count_time_series => Nightfury::Metric::CountTimeSeries
-          }
+        :value => Nightfury::Metric::Value,
+        :time_series => Nightfury::Metric::TimeSeries,
+        :avg_time_series => Nightfury::Metric::AvgTimeSeries,
+        :count_time_series => Nightfury::Metric::CountTimeSeries
+      }
 
       class << self
         
@@ -28,6 +28,10 @@ module Nightfury
               @_#{name} ||= METRIC_MAPPINGS[:#{type}].new(:#{name}, redis_key_prefix: key_prefix, store_as: #{store_as}, step: #{step})
             end
           ENDOFMETHOD
+        end
+
+        def metric_names
+          metrics.keys
         end
         
         def tag(name, options={})
@@ -54,6 +58,12 @@ module Nightfury
 
       def new_record?
         redis.keys("#{key_prefix}*").empty?
+      end
+
+      def delete
+        self.class.metric_names.each do |metric_name|
+          public_send(metric_name).delete
+        end
       end
 
       private 
