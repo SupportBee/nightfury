@@ -88,5 +88,28 @@ describe Nightfury::Identity::Base do
         metric_object.step.should == :day
       end
     end
+
+    describe "#delete" do
+      class CompanyIdentity < Nightfury::Identity::Base
+        metric :tickets_count, :count_time_series, store_as: :b, step: :day
+        metric :avg_first_response_time, :avg_time_series, store_as: :d, step: :day
+      end
+
+      it "deletes the identity's metrics" do
+        company_id = 12
+        company_identity = CompanyIdentity.new(company_id)
+        day = Time.new(2018, 1, 1)
+        company_tickets_count = 100
+        company_identity.tickets_count.set(100, day)
+        first_response_time_for_a_ticket = 3600
+        company_identity.avg_first_response_time.set(3600, day)
+
+        company_identity.redis.exists(company_identity.tickets_count.redis_key).should == true
+        company_identity.redis.exists(company_identity.avg_first_response_time.redis_key).should == true
+        company_identity.delete
+        company_identity.redis.exists(company_identity.tickets_count.redis_key).should == false
+        company_identity.redis.exists(company_identity.avg_first_response_time.redis_key).should == false
+      end
+    end
   end
 end
