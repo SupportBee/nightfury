@@ -1,5 +1,7 @@
-.sass-cache/
+Gemfile.lock
 .bundle
+vendor/bundle/
+.sass-cache/
 public/javascripts/app_error_handler.js
 supportbeeapp_production.sql
 solr/data

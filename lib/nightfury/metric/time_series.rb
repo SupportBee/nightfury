@@ -12,7 +12,7 @@ module Nightfury
           hour: 1.hour,
           day: 1.day,
           week: 1.week,
-          month: Time.days_in_month(time.month, time.year)
+          month: Time.days_in_month(time.month, time.year).days
         }[step_name]
       end
 

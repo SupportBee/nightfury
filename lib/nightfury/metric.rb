@@ -21,10 +21,8 @@ module Nightfury
       end
 
       def delete
-        redis.del redis_key
+        redis.del(redis_key)
       end
     end
   end
 end
-
-

@@ -39,7 +39,7 @@ describe Nightfury::Metric::TimeSeries do
       it "should retrun nil if metric key on redis is empty" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         # delete redis key
-        ts_metric.redis.del ts_metric.redis_key
+        ts_metric.redis.del(ts_metric.redis_key)
         ts_metric.get.should be_nil
       end
 
@@ -125,7 +125,7 @@ describe Nightfury::Metric::TimeSeries do
       it "should retrun nil if metric key on redis is empty" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         # delete redis key
-        ts_metric.redis.del ts_metric.redis_key
+        ts_metric.redis.del(ts_metric.redis_key)
         ts_metric.get_exact(Time.now).should be_nil
       end      
     end
@@ -134,7 +134,7 @@ describe Nightfury::Metric::TimeSeries do
       it "should retrun nil if metric key on redis is empty" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         # delete redis key
-        ts_metric.redis.del ts_metric.redis_key
+        ts_metric.redis.del(ts_metric.redis_key)
         ts_metric.get_range(Time.now, Time.now).should be_nil
       end
 
@@ -165,7 +165,7 @@ describe Nightfury::Metric::TimeSeries do
       it "should return nil if metric key on redis is empty" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         # delete redis key
-        ts_metric.redis.del ts_metric.redis_key
+        ts_metric.redis.del(ts_metric.redis_key)
         ts_metric.get_all.should be_nil
       end
 
