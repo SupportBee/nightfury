@@ -4,8 +4,8 @@ describe Nightfury do
   describe "redis setup" do
     it "should default redis connection to Redis.current" do
       Nightfury.redis.client.host.should == "localhost"
-      Nightfury.redis.client.port.should == 9212
-      Nightfury.redis.client.db.should == 0
+      Nightfury.redis.client.port.should == 6379
+      Nightfury.redis.client.db.should == 3
     end
 
     it "should accept a redis connection" do
