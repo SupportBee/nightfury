@@ -127,25 +127,25 @@ describe Nightfury::Metric::TimeSeries do
         # delete redis key
         ts_metric.redis.del(ts_metric.redis_key)
         ts_metric.get_exact(Time.now).should be_nil
-      end      
+      end
     end
 
     describe "#get_range" do
-      it "should retrun nil if metric key on redis is empty" do
+      it "should return nil if metric key on redis is empty" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         # delete redis key
         ts_metric.redis.del(ts_metric.redis_key)
         ts_metric.get_range(Time.now, Time.now).should be_nil
       end
 
-      it "should return an empty array if no data points are present in the specified ranges" do
+      it "should return an empty array if no data points are present in the given time range" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
         ts_metric.get_range(Time.now, Time.now).should be_empty
       end
 
-      it "should get all data points between the specified ranges" do
+      it "should get all data points in the given time range" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:time)
-        time = Time.now
+        time = Time.utc(2050, 1, 1)
         loop_time = time.dup
 
         10.times do |i|
@@ -153,11 +153,11 @@ describe Nightfury::Metric::TimeSeries do
           loop_time = loop_time + 61
         end
 
-        start_time = time + (3*60)
-        end_time = time + (5*60)
+        start_time = time + (3 * 60)
+        end_time = time + (5 * 60)
 
         result = ts_metric.get_range(start_time, end_time)
-        result.values.should == ['3','4','5']
+        result.values.should == ['3', '4', '5']
       end
     end
 
@@ -198,22 +198,22 @@ describe Nightfury::Metric::TimeSeries do
         flexmock(ts_metric).should_receive(:before_set).with(1, time).and_return([1,time]).once
         ts_metric.set(1, time)
       end
-    
+
       it "should not call before_set, before adding the value to the timeline if optiond ':skip_before_set' is provided" do
         ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
         flexmock(ts_metric).should_receive(:before_set).with(1).never
         ts_metric.set(1, Time.now, :skip_before_set => true)
       end
     end
-  
+
     describe "add the value to timeline" do
       it "should default time to the step near the current time" do
-        time_now = Time.now 
+        time_now = Time.now
         ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
 
         flexmock(ts_metric.redis).should_receive(:zadd)
-                                 .with(ts_metric.redis_key, 
-                                       floor_time(time_now, 60).to_i, 
+                                 .with(ts_metric.redis_key,
+                                       floor_time(time_now, 60).to_i,
                                        FlexMock.any)
                                  .once
 
@@ -228,8 +228,8 @@ describe Nightfury::Metric::TimeSeries do
         ts_metric = Nightfury::Metric::TimeSeries.new(:avg_time)
 
         flexmock(ts_metric.redis).should_receive(:zadd)
-                                 .with(ts_metric.redis_key, 
-                                       floor_time(time, 60).to_i, 
+                                 .with(ts_metric.redis_key,
+                                       floor_time(time, 60).to_i,
                                        FlexMock.any)
                                  .once
 

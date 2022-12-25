@@ -62,7 +62,7 @@ describe Nightfury::Identity::Base do
 
       d = Dummy.new(1)
       d.should be_new_record
-      
+
       d.new_metric.set(1)
       d.should_not be_new_record
     end
@@ -104,11 +104,11 @@ describe Nightfury::Identity::Base do
         first_response_time_for_a_ticket = 3600
         company_identity.avg_first_response_time.set(3600, day)
 
-        company_identity.redis.exists(company_identity.tickets_count.redis_key).should == true
-        company_identity.redis.exists(company_identity.avg_first_response_time.redis_key).should == true
+        company_identity.redis.exists(company_identity.tickets_count.redis_key).should == 1
+        company_identity.redis.exists(company_identity.avg_first_response_time.redis_key).should == 1
         company_identity.delete
-        company_identity.redis.exists(company_identity.tickets_count.redis_key).should == false
-        company_identity.redis.exists(company_identity.avg_first_response_time.redis_key).should == false
+        company_identity.redis.exists(company_identity.tickets_count.redis_key).should == 0
+        company_identity.redis.exists(company_identity.avg_first_response_time.redis_key).should == 0
       end
     end
   end
